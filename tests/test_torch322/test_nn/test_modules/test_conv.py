@@ -1,4 +1,4 @@
-from torch322.nn.conv import Conv2dStdWeight, ConvTranspose2dStdWeight
+from torch322.nn import Conv2dStdWeight, ConvTranspose2dStdWeight
 
 import torch
 
@@ -22,9 +22,9 @@ class TestConv(unittest.TestCase):
         expected_output_width = 8
         expected_output_height = 6
 
-        lin = Conv2dStdWeight(in_channels, out_channels, kernel_size, stride=stride, groups=groups, bias=bias)
+        conv = Conv2dStdWeight(in_channels, out_channels, kernel_size, stride=stride, groups=groups, bias=bias)
         input_tensor = torch.randn(batch_size, in_channels, input_width, input_height)
-        output_tensor = lin(input_tensor)
+        output_tensor = conv(input_tensor)
 
         self.assertListEqual(
             list(output_tensor.size()),

@@ -1,4 +1,4 @@
-from torch322.nn.linear import LinearStdWeight
+from torch322.nn import LinearStdWeight
 
 import torch
 
