@@ -1,7 +1,7 @@
 from torch.nn.functional import pad
 
 
-def pad_with_spatial_indicator_channels(
+def pad322(
         input_,
         channel_dim,
         spatial_dims,
