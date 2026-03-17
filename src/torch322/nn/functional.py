@@ -1,4 +1,6 @@
-from torch.nn.functional import pad
+import torch
+
+from torch.nn import functional as F
 
 
 def pad322(
@@ -58,7 +60,7 @@ def pad322(
 
     torch_padding[-2 * (channel_dim + 1)] += n_spatial
 
-    padded = pad(input_, torch_padding)
+    padded = F.pad(input_, torch_padding)
 
     # --- fill indicator channels ---
     for i, (dim, (lp, rp), (lv, rv)) in enumerate(zip(
@@ -76,3 +78,11 @@ def pad322(
             padded[*pad_slice] = rv
 
     return padded
+
+
+def crelu(x, dim=-1):
+    """
+    Concatenated ReLU from
+    "Understanding and Improving Convolutional Neural Networks via Concatenated Rectified Linear Units"
+    """
+    return torch.cat([F.relu(x), F.relu(-x)], dim=dim)
