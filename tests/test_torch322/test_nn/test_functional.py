@@ -1,4 +1,4 @@
-from torch322.nn.functional.pad import pad322
+from torch322.nn.functional import pad_with_spatial_indicator_channels
 
 from pathlib import Path
 import json
@@ -9,12 +9,12 @@ import unittest
 
 
 _HERE = Path(__file__).parent
-_DATA_FOLDER = _HERE / "../../../data"
+_DATA_FOLDER = _HERE / "../../data"
 
 
-class TestPad(unittest.TestCase):
+class TestFunctional(unittest.TestCase):
 
-    def test_pad322(self):
+    def test_pad_with_spatial_indicator_channels(self):
         generate = False  # To generate ref file, launch with generate = True
 
         input_ = torch.arange(4 * 5 * 2 * 3, dtype=torch.float).view(4, 5, 2, 3)
@@ -23,7 +23,7 @@ class TestPad(unittest.TestCase):
         spatial_paddings = [[3, 4], [1, 2]]
         padding_values = [[0.5, 1.5], [2.5, 3.5]]
 
-        padded_input = pad322(input_, channel_dim, spatial_dims, spatial_paddings, padding_values)
+        padded_input = pad_with_spatial_indicator_channels(input_, channel_dim, spatial_dims, spatial_paddings, padding_values)
 
         print(input_.size())
         print(padded_input.size())
