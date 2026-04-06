@@ -1,11 +1,14 @@
 # adapted from https://pytorch.org/docs/stable/_modules/torch/nn/modules/conv.html
-# change reset parameters using normal with mu=0 and std=1
-from torch.nn import Conv2d, ConvTranspose2d
 
 import math
 
+from torch.nn import Conv2d, ConvTranspose2d
+from torch.linalg import matrix_norm
+
 
 class Conv2dStdWeight(Conv2d):
+    # change reset parameters using normal with mu=0 and std=1
+    # self.normalize_weight() must be called after each weight update in order to constrain weight.
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -16,12 +19,18 @@ class Conv2dStdWeight(Conv2d):
         self.weight.data.normal_()
         if self.bias is not None:
             self.bias.data.normal_()
+        self.normalize_weight()
 
     def forward(self, *args, **kwargs):
         return super().forward(*args, **kwargs) * self.norm_factor
 
+    def normalize_weight(self):
+        self.weight.data *= math.sqrt(self.weight.data.numel()) / matrix_norm(self.weight.data)
+
 
 class ConvTranspose2dStdWeight(ConvTranspose2d):
+    # change reset parameters using normal with mu=0 and std=1
+    # self.normalize_weight() must be called after each weight update in order to constrain weight.
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,6 +41,10 @@ class ConvTranspose2dStdWeight(ConvTranspose2d):
         self.weight.data.normal_()
         if self.bias is not None:
             self.bias.data.normal_()
+        self.normalize_weight()
 
     def forward(self, *args, **kwargs):
         return super().forward(*args, **kwargs) * self.norm_factor
+
+    def normalize_weight(self):
+        self.weight.data *= math.sqrt(self.weight.data.numel()) / matrix_norm(self.weight.data)

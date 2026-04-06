@@ -1,11 +1,15 @@
 # adapted from https://github.com/pytorch/pytorch/blob/master/torch/nn/modules/linear.py
-# change reset parameters using normal with mu=0 and std=1
-from torch.nn import Linear
 
 import math
 
+from torch.nn import Linear
+from torch.linalg import matrix_norm
+
 
 class LinearStdWeight(Linear):
+    # weight are constrained: sum(w[i,j]**2) == number of element in weight
+    # bias are initialized using standard normal (mu=0, sigma=1)
+    # self.normalize_weight() must be called after each weight update in order to constrain weight.
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -15,6 +19,10 @@ class LinearStdWeight(Linear):
         self.weight.data.normal_()
         if self.bias is not None:
             self.bias.data.normal_()
+        self.normalize_weight()
 
     def forward(self, *args, **kwargs):
         return super().forward(*args, **kwargs) * self.norm_factor
+
+    def normalize_weight(self):
+        self.weight.data *= math.sqrt(self.weight.data.numel()) / matrix_norm(self.weight.data)
