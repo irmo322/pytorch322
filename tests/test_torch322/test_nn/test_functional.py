@@ -25,13 +25,13 @@ class TestFunctional(unittest.TestCase):
 
         padded_input = pad322(input_, channel_dim, spatial_dims, spatial_paddings, padding_values)
 
-        print(input_.size())
-        print(padded_input.size())
-
-        for i in range(input_.size(0)):
-            print(f"i={i}")
-            print(input_[i])
-            print(padded_input[i])
+        # print(input_.size())
+        # print(padded_input.size())
+        #
+        # for i in range(input_.size(0)):
+        #     print(f"i={i}")
+        #     print(input_[i])
+        #     print(padded_input[i])
 
         expected_padded_input_file_path = _DATA_FOLDER / "expected_pad322_result.json"
 
@@ -57,13 +57,13 @@ class TestFunctional(unittest.TestCase):
 
         padded_input = pad323(input_, channel_dim, paddings)
 
-        print(input_.size())
-        print(padded_input.size())
-
-        for i in range(input_.size(0)):
-            print(f"i={i}")
-            print(input_[i])
-            print(padded_input[i])
+        # print(input_.size())
+        # print(padded_input.size())
+        #
+        # for i in range(input_.size(0)):
+        #     print(f"i={i}")
+        #     print(input_[i])
+        #     print(padded_input[i])
 
         expected_padded_input_file_path = _DATA_FOLDER / "expected_pad323_result.json"
 
