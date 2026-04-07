@@ -3,7 +3,7 @@
 import math
 
 from torch.nn import Conv2d, ConvTranspose2d
-from torch.linalg import matrix_norm
+from torch.linalg import vector_norm
 
 
 class Conv2dStdWeight(Conv2d):
@@ -25,7 +25,7 @@ class Conv2dStdWeight(Conv2d):
         return super().forward(*args, **kwargs) * self.norm_factor
 
     def normalize_weight(self):
-        self.weight.data *= math.sqrt(self.weight.data.numel()) / matrix_norm(self.weight.data)
+        self.weight.data *= math.sqrt(self.weight.data.numel()) / vector_norm(self.weight.data)
 
 
 class ConvTranspose2dStdWeight(ConvTranspose2d):
@@ -47,4 +47,4 @@ class ConvTranspose2dStdWeight(ConvTranspose2d):
         return super().forward(*args, **kwargs) * self.norm_factor
 
     def normalize_weight(self):
-        self.weight.data *= math.sqrt(self.weight.data.numel()) / matrix_norm(self.weight.data)
+        self.weight.data *= math.sqrt(self.weight.data.numel()) / vector_norm(self.weight.data)
