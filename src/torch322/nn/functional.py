@@ -80,7 +80,7 @@ def pad322(
     return padded
 
 
-def pad323(
+def pad_with_indicator_channels(
         x,
         channel_dim,
         paddings,
@@ -91,7 +91,7 @@ def pad323(
     :param channel_dim: channel dimension.
     :param paddings: list of (dim, side, length, value) where
     - dim : padding dimension.
-    - side : padding side in ["low", "high"].
+    - side : padding side in ["prepend", "append"].
     - length : padding length.
     - value : padding value for indicator channel.
     :return:
@@ -103,28 +103,28 @@ def pad323(
         raise ValueError(f"channel_dim ({channel_dim}) outside of input dims.")
 
     # --- build padding arrays ---
-    low_paddings = [0] * n_dims
-    high_paddings = [0] * n_dims
+    prepend_paddings = [0] * n_dims
+    append_paddings = [0] * n_dims
 
     for dim, side, length, value in paddings:
-        if side == "low":
-            if low_paddings[dim] > 0:
-                raise ValueError(f"Duplicate padding configuration for low side of dim {dim}.")
-            low_paddings[dim] = length
-        elif side == "high":
-            if high_paddings[dim] > 0:
-                raise ValueError(f"Duplicate padding configuration for high side of dim {dim}.")
-            high_paddings[dim] = length
+        if side == "prepend":
+            if prepend_paddings[dim] > 0:
+                raise ValueError(f"Duplicate padding configuration for prepend side of dim {dim}.")
+            prepend_paddings[dim] = length
+        elif side == "append":
+            if append_paddings[dim] > 0:
+                raise ValueError(f"Duplicate padding configuration for append side of dim {dim}.")
+            append_paddings[dim] = length
         else:
-            raise ValueError(f"side ({side}) must be one of 'low' or 'high'.")
+            raise ValueError(f"side ({side}) must be one of 'prepend' or 'append'.")
 
-    if low_paddings[channel_dim] > 0 or high_paddings[channel_dim] > 0:
+    if prepend_paddings[channel_dim] > 0 or append_paddings[channel_dim] > 0:
         raise ValueError(f"channel_dim ({channel_dim}) in paddings list.")
-    low_paddings[channel_dim] = len(paddings)
+    prepend_paddings[channel_dim] = len(paddings)
 
     # --- torch padding format ---
     torch_padding = []
-    for lp, hp in zip(reversed(low_paddings), reversed(high_paddings)):
+    for lp, hp in zip(reversed(prepend_paddings), reversed(append_paddings)):
         torch_padding.extend([lp, hp])
 
     padded = F.pad(x, torch_padding)
@@ -134,7 +134,7 @@ def pad323(
         pad_slice = [slice(None)] * n_dims
         pad_slice[channel_dim] = i
 
-        if side == "low":
+        if side == "prepend":
             pad_slice[dim] = slice(length)
         else:
             pad_slice[dim] = slice(-length, None)

@@ -1,6 +1,6 @@
 from torch import nn
 
-from ..functional import pad322, pad323
+from ..functional import pad322, pad_with_indicator_channels
 
 
 class Padder322(nn.Module):
@@ -16,7 +16,7 @@ class Padder322(nn.Module):
         return pad322(x, self.channel_dim, self.spatial_dims, self.spatial_paddings, self.padding_values)
 
 
-class Padder323(nn.Module):
+class PadderWithIndicatorChannels(nn.Module):
 
     def __init__(self, channel_dim, paddings):
         super().__init__()
@@ -24,4 +24,4 @@ class Padder323(nn.Module):
         self.paddings = paddings
 
     def forward(self, x):
-        return pad323(x, self.channel_dim, self.paddings)
+        return pad_with_indicator_channels(x, self.channel_dim, self.paddings)

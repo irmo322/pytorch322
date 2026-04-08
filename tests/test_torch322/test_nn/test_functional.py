@@ -1,4 +1,4 @@
-from torch322.nn.functional import pad322, pad323, crelu, add_constant_channel
+from torch322.nn.functional import pad322, pad_with_indicator_channels, crelu, add_constant_channel
 
 from pathlib import Path
 import json
@@ -44,18 +44,18 @@ class TestFunctional(unittest.TestCase):
 
         self.assertListEqual(padded_input.tolist(), expected_padded_input)
 
-    def test_pad323(self):
+    def test_pad_with_indicator_channels(self):
         generate = False  # To generate ref file, launch with generate = True
 
         input_ = torch.arange(4 * 5 * 2 * 3, dtype=torch.float).view(4, 5, 2, 3)
         channel_dim = 1
         paddings = [
-            [3, "high", 2, 3.5],
-            [2, "low", 3, 0.5],
-            [3, "low", 1, 2.5],
+            [3, "append", 2, 3.5],
+            [2, "prepend", 3, 0.5],
+            [3, "prepend", 1, 2.5],
         ]
 
-        padded_input = pad323(input_, channel_dim, paddings)
+        padded_input = pad_with_indicator_channels(input_, channel_dim, paddings)
 
         # print(input_.size())
         # print(padded_input.size())
@@ -65,7 +65,7 @@ class TestFunctional(unittest.TestCase):
         #     print(input_[i])
         #     print(padded_input[i])
 
-        expected_padded_input_file_path = _DATA_FOLDER / "expected_pad323_result.json"
+        expected_padded_input_file_path = _DATA_FOLDER / "expected_pad_with_indicator_channels_result.json"
 
         if generate:
             with open(expected_padded_input_file_path, "w") as f:
@@ -79,12 +79,12 @@ class TestFunctional(unittest.TestCase):
         # Idem with negative indexes
         channel_dim = -3
         paddings = [
-            [-1, "high", 2, 3.5],
-            [-2, "low", 3, 0.5],
-            [-1, "low", 1, 2.5],
+            [-1, "append", 2, 3.5],
+            [-2, "prepend", 3, 0.5],
+            [-1, "prepend", 1, 2.5],
         ]
 
-        padded_input_neg = pad323(input_, channel_dim, paddings)
+        padded_input_neg = pad_with_indicator_channels(input_, channel_dim, paddings)
 
         self.assertListEqual(padded_input_neg.tolist(), expected_padded_input)
 
