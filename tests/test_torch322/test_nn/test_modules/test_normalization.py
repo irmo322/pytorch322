@@ -1,6 +1,6 @@
 import torch
 
-from torch322.nn import ChannelNorm
+import torch322
 
 import unittest
 
@@ -10,7 +10,7 @@ from ...unittest_utils import myAssertAlmostEqual
 class TestNormalization(unittest.TestCase):
 
     def test_channel_norm_constant(self):
-        channel_norm = ChannelNorm(-2, constant_channel=True)
+        channel_norm = torch322.nn.ChannelNorm(-2, constant_channel=True)
 
         x = torch.tensor([
             [
@@ -47,7 +47,7 @@ class TestNormalization(unittest.TestCase):
         myAssertAlmostEqual(self, y, y_expected, relative_delta=0.0001)
 
     def test_channel_norm_log(self):
-        channel_norm = ChannelNorm(-2, constant_channel=True, factor_log_channel=True)
+        channel_norm = torch322.nn.ChannelNorm(-2, constant_channel=True, factor_log_channel=True)
 
         x = torch.tensor([
             [

@@ -1,6 +1,6 @@
-from torch322.utils.tensor_checking import check_tensor_sizes, TensorSizeError
-
 import torch
+
+import torch322
 
 import unittest
 
@@ -31,25 +31,25 @@ class TestTensorChecking(unittest.TestCase):
         ]
         true_dimensions_b = [("b", 4, -1), ("c", None), ("b",)]
 
-        result, _ = check_tensor_sizes(tensors_a, true_dimensions_a)
+        result, _ = torch322.utils.check_tensor_sizes(tensors_a, true_dimensions_a)
         self.assertTrue(result)
 
-        result, _ = check_tensor_sizes(tensors_b, true_dimensions_b)
+        result, _ = torch322.utils.check_tensor_sizes(tensors_b, true_dimensions_b)
         self.assertTrue(result)
 
-        result, _ = check_tensor_sizes(tensors_b, true_dimensions_a)
+        result, _ = torch322.utils.check_tensor_sizes(tensors_b, true_dimensions_a)
         self.assertFalse(result)
-        with self.assertRaises(TensorSizeError):
-            check_tensor_sizes(tensors_b, true_dimensions_a, raise_exception=True)
+        with self.assertRaises(torch322.utils.TensorSizeError):
+            torch322.utils.check_tensor_sizes(tensors_b, true_dimensions_a, raise_exception=True)
 
         for bad_dimensions in bad_dimensions_a_list:
-            result, _ = check_tensor_sizes(tensors_a, bad_dimensions)
+            result, _ = torch322.utils.check_tensor_sizes(tensors_a, bad_dimensions)
             # print(result, tensors_a, bad_dimensions)
             self.assertFalse(result)
-            with self.assertRaises(TensorSizeError):
-                check_tensor_sizes(tensors_a, bad_dimensions, raise_exception=True)
+            with self.assertRaises(torch322.utils.TensorSizeError):
+                torch322.utils.check_tensor_sizes(tensors_a, bad_dimensions, raise_exception=True)
 
-        result, _ = check_tensor_sizes(tensors_a, true_dimensions_a[:-1])
+        result, _ = torch322.utils.check_tensor_sizes(tensors_a, true_dimensions_a[:-1])
         self.assertFalse(result)
         with self.assertRaises(ValueError):
-            check_tensor_sizes(tensors_a, true_dimensions_a[:-1], raise_exception=True)
+            torch322.utils.check_tensor_sizes(tensors_a, true_dimensions_a[:-1], raise_exception=True)

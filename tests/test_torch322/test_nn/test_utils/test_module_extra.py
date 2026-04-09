@@ -1,22 +1,22 @@
-from torch322.nn.utils.module_extra import call_module_method, call_module_method_recursive
-
 import torch
+
+import torch322
 
 import unittest
 
-class TestModuleExt(unittest.TestCase):
+class TestModuleExtra(unittest.TestCase):
 
     def test_call_module_method(self):
         module_a = SuperModuleA([])
 
         with self.assertRaises(RuntimeError):
-            call_module_method(module_a, "toto", required=True)
-        call_module_method(module_a, "toto", required=False)
+            torch322.nn.utils.call_module_method(module_a, "toto", required=True)
+        torch322.nn.utils.call_module_method(module_a, "toto", required=False)
 
-        call_module_method(module_a, "plop", required=True, args=[2])
+        torch322.nn.utils.call_module_method(module_a, "plop", required=True, args=[2])
         self.assertEqual(module_a.a, 12)
 
-        call_module_method(module_a, "plop", required=False)
+        torch322.nn.utils.call_module_method(module_a, "plop", required=False)
         self.assertEqual(module_a.a, 13)
 
     def test_call_module_method_recursive(self):
@@ -32,7 +32,7 @@ class TestModuleExt(unittest.TestCase):
             ]),
         ])
 
-        call_module_method_recursive(module, "plop", required=False, kwargs={'inc':2})
+        torch322.nn.utils.call_module_method_recursive(module, "plop", required=False, kwargs={'inc':2})
 
         self.assertEqual(module.a, 12)
         self.assertEqual(module.sub_modules[0].a, 12)

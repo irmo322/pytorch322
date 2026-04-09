@@ -1,9 +1,9 @@
-from torch322.nn.functional import pad322, pad_with_indicator_channels, crelu, add_constant_channel
-
 from pathlib import Path
 import json
 
 import torch
+
+import torch322.nn.functional as F
 
 import unittest
 
@@ -23,7 +23,7 @@ class TestFunctional(unittest.TestCase):
         spatial_paddings = [[3, 4], [1, 2]]
         padding_values = [[0.5, 1.5], [2.5, 3.5]]
 
-        padded_input = pad322(input_, channel_dim, spatial_dims, spatial_paddings, padding_values)
+        padded_input = F.pad322(input_, channel_dim, spatial_dims, spatial_paddings, padding_values)
 
         # print(input_.size())
         # print(padded_input.size())
@@ -55,7 +55,7 @@ class TestFunctional(unittest.TestCase):
             [3, "prepend", 1, 2.5],
         ]
 
-        padded_input = pad_with_indicator_channels(input_, channel_dim, paddings)
+        padded_input = F.pad_with_indicator_channels(input_, channel_dim, paddings)
 
         # print(input_.size())
         # print(padded_input.size())
@@ -84,17 +84,17 @@ class TestFunctional(unittest.TestCase):
             [-1, "prepend", 1, 2.5],
         ]
 
-        padded_input_neg = pad_with_indicator_channels(input_, channel_dim, paddings)
+        padded_input_neg = F.pad_with_indicator_channels(input_, channel_dim, paddings)
 
         self.assertListEqual(padded_input_neg.tolist(), expected_padded_input)
 
     def test_crelu(self):
         x = torch.tensor([[1, -2, 3, -4], [-5, -6, 7, 8]])
 
-        y_a = crelu(x, dim=0)
-        y_b = crelu(x, dim=1)
-        y_c = crelu(x, dim=-2)
-        y_d = crelu(x, dim=-1)
+        y_a = F.crelu(x, dim=0)
+        y_b = F.crelu(x, dim=1)
+        y_c = F.crelu(x, dim=-2)
+        y_d = F.crelu(x, dim=-1)
 
         y_1 = [[1, 0, 3, 0], [0, 0, 7, 8], [0, 2, 0, 4], [5, 6, 0, 0]]
         y_2 = [[1, 0, 3, 0, 0, 2, 0, 4], [0, 0, 7, 8, 5, 6, 0, 0]]
@@ -108,12 +108,12 @@ class TestFunctional(unittest.TestCase):
     def test_add_constant_channel(self):
         a = torch.tensor([[1, 2, 3], [4, 5, 6]])
 
-        r1 = add_constant_channel(a, 0)
-        r2 = add_constant_channel(a, 1)
-        r3 = add_constant_channel(a, -2)
-        r4 = add_constant_channel(a, -1)
-        r5 = add_constant_channel(a, 0, constant_value=322)
-        r6 = add_constant_channel(a, 0, location="append")
+        r1 = F.add_constant_channel(a, 0)
+        r2 = F.add_constant_channel(a, 1)
+        r3 = F.add_constant_channel(a, -2)
+        r4 = F.add_constant_channel(a, -1)
+        r5 = F.add_constant_channel(a, 0, constant_value=322)
+        r6 = F.add_constant_channel(a, 0, location="append")
 
         expected_r1 = [[1, 1, 1], [1, 2, 3], [4, 5, 6]]
         expected_r2 = [[1, 1, 2, 3], [1, 4, 5, 6]]

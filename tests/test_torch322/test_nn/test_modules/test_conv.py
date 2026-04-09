@@ -1,4 +1,4 @@
-from torch322.nn import Conv2dStdWeight, ConvTranspose2dStdWeight
+import torch322
 
 import torch
 
@@ -22,7 +22,7 @@ class TestConv(unittest.TestCase):
         expected_output_width = 8
         expected_output_height = 6
 
-        conv = Conv2dStdWeight(in_channels, out_channels, kernel_size, stride=stride, groups=groups, bias=bias)
+        conv = torch322.nn.Conv2dStdWeight(in_channels, out_channels, kernel_size, stride=stride, groups=groups, bias=bias)
         input_tensor = torch.randn(batch_size, in_channels, input_width, input_height)
         output_tensor = conv(input_tensor)
 

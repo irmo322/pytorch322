@@ -1,6 +1,6 @@
-from torch322.nn import LinearStdWeight
-
 import torch
+
+import torch322
 
 import unittest
 
@@ -14,7 +14,7 @@ class TestLinear(unittest.TestCase):
         in_features = 100
         out_features = 80
 
-        lin = LinearStdWeight(in_features, out_features, bias=True)
+        lin = torch322.nn.LinearStdWeight(in_features, out_features, bias=True)
         input_tensor = torch.randn(batch_size, in_features)
         output_tensor = lin(input_tensor)
 
