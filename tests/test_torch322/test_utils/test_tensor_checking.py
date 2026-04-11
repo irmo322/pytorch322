@@ -7,7 +7,7 @@ import unittest
 
 class TestTensorChecking(unittest.TestCase):
 
-    def test_check_tensor_sizes(self):
+    def test_check_tensor_size(self):
         tensors_a = [
             torch.zeros(3, 4, 5),
             torch.zeros(3, 10),
@@ -31,25 +31,25 @@ class TestTensorChecking(unittest.TestCase):
         ]
         true_dimensions_b = [("b", 4, -1), ("c", None), ("b",)]
 
-        result, _ = torch322.utils.check_tensor_sizes(tensors_a, true_dimensions_a)
-        self.assertTrue(result)
+        torch322.utils.check_tensor_size(tensors_a, true_dimensions_a)
+        torch322.utils.check_tensor_size(tensors_b, true_dimensions_b)
 
-        result, _ = torch322.utils.check_tensor_sizes(tensors_b, true_dimensions_b)
-        self.assertTrue(result)
-
-        result, _ = torch322.utils.check_tensor_sizes(tensors_b, true_dimensions_a)
-        self.assertFalse(result)
         with self.assertRaises(torch322.utils.TensorSizeError):
-            torch322.utils.check_tensor_sizes(tensors_b, true_dimensions_a, raise_exception=True)
+            torch322.utils.check_tensor_size(tensors_b, true_dimensions_a)
 
         for bad_dimensions in bad_dimensions_a_list:
-            result, _ = torch322.utils.check_tensor_sizes(tensors_a, bad_dimensions)
-            # print(result, tensors_a, bad_dimensions)
-            self.assertFalse(result)
             with self.assertRaises(torch322.utils.TensorSizeError):
-                torch322.utils.check_tensor_sizes(tensors_a, bad_dimensions, raise_exception=True)
+                torch322.utils.check_tensor_size(tensors_a, bad_dimensions)
 
-        result, _ = torch322.utils.check_tensor_sizes(tensors_a, true_dimensions_a[:-1])
-        self.assertFalse(result)
-        with self.assertRaises(ValueError):
-            torch322.utils.check_tensor_sizes(tensors_a, true_dimensions_a[:-1], raise_exception=True)
+        with self.assertRaises(torch322.utils.TensorSizeError):
+            torch322.utils.check_tensor_size(tensors_a, true_dimensions_a[:-1])
+
+    def test_tensor_size_checker(self):
+        tsc = torch322.utils.TensorSizeChecker(values={"a": 10})
+
+        tsc.check(torch.zeros(5, 10, 15), [5, "a", -1])
+        tsc.check(torch.zeros(20), ["b"])
+        tsc.check(torch.Size((10, 20)), ["a", "b"])
+
+        with self.assertRaises(torch322.utils.TensorSizeError):
+            tsc.check(torch.zeros(10, 21), ["a", "b"])
