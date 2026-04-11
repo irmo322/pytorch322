@@ -53,3 +53,26 @@ class TestTensorChecking(unittest.TestCase):
 
         with self.assertRaises(torch322.utils.TensorSizeError):
             tsc.check(torch.zeros(10, 21), ["a", "b"])
+
+        tsc.check(
+            {
+                "tensor1": torch.Size((10, 20)),
+                "tensor2": torch.Size((20, 30)),
+            },
+            {
+                "tensor1": [10, 20],
+                "tensor2": [20, 30],
+            },
+        )
+
+        with self.assertRaises(torch322.utils.TensorSizeError):
+            tsc.check(
+                {
+                    "tensor1": torch.Size((10, 20)),
+                    "tensor2": torch.Size((20, 30)),
+                },
+                {
+                    "tensor1": [10, 20],
+                    "tensor3": [20, 30],
+                },
+            )

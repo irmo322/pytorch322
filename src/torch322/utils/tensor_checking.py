@@ -59,6 +59,8 @@ def check_tensor_size(tensor_or_size_s, expected_size_s, values=None):
 
         keys = tensor_or_size_s.keys() if type(tensor_or_size_s) is dict else range(len(tensor_or_size_s))
         for key in keys:
+            if key not in expected_size_s:
+                raise TensorSizeError(f"key ({key}) not found in expected size ({expected_size_s})")
             check_tensor_size(tensor_or_size_s[key], expected_size_s[key], values=values)
 
     return values
