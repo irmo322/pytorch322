@@ -47,3 +47,57 @@ def cat_pool(x, channel_dim, spatial_dims, kernel_size):
     y = x_permuted.reshape(final_shape)
 
     return y
+
+
+def cat_unpool(x, channel_dim, spatial_dims, kernel_size):
+    # Validation
+    dim_usage = [0] * x.dim()
+    dim_usage[channel_dim] += 1
+    for dim in spatial_dims:
+        dim_usage[dim] += 1
+    if max(dim_usage) > 1:
+        raise ValueError(f"Redundant dimension in [{channel_dim}], {spatial_dims} for torch of size {x.size()}.")
+
+    if len(kernel_size) != len(spatial_dims):
+        raise ValueError(f"Kernel size and spatial dims do not match ({len(kernel_size)} != {len(spatial_dims)}).")
+
+    total_kernel_size = 1
+    for kernel_dim_size in kernel_size:
+        total_kernel_size *= kernel_dim_size
+
+    if x.size(channel_dim) % total_kernel_size != 0:
+        raise ValueError(f"Channel size ({x.size(channel_dim)}) must be divisible by kernel size ({kernel_size}).")
+
+    # 1. Split channel dim into [kernel_dims..., reduced_channel]
+    split_dims = [[dim_size] for dim_size in x.size()]
+    split_dims[channel_dim] = [*kernel_size, x.size(channel_dim) // total_kernel_size]
+
+    # 2. Reshape: introduce kernel dimensions as explicit dimensions
+    x_split = x.reshape([dim_size for dim_sizes in split_dims for dim_size in dim_sizes])
+
+    # 3. Build mapping: original dim -> indices in x_split
+    i = 0
+    orig_to_split_indices = []
+    for dim_sizes in split_dims:
+        orig_to_split_indices.append(list(range(i, i + len(dim_sizes))))
+        i += len(dim_sizes)
+
+    # 4. Move kernel indices back to their spatial dims
+    kernel_indices = orig_to_split_indices[channel_dim][:-1]  # all but the last (reduced channel)
+    orig_to_split_indices[channel_dim] = [orig_to_split_indices[channel_dim][-1]]
+    for kernel_idx, spatial_dim in zip(kernel_indices, spatial_dims):
+        orig_to_split_indices[spatial_dim].append(kernel_idx)
+
+    # 5. Permute to move kernel indices back to spatial dims
+    perm = [idx for dim_indices in orig_to_split_indices for idx in dim_indices]
+    x_permuted = x_split.permute(perm)
+
+    # 6. Final reshape: merge kernel dimensions back into spatial dims
+    final_shape = list(x.size())
+    for kernel_dim_size, spatial_dim in zip(kernel_size, spatial_dims):
+        final_shape[spatial_dim] *= kernel_dim_size
+        final_shape[channel_dim] //= kernel_dim_size
+
+    y = x_permuted.reshape(final_shape)
+
+    return y
