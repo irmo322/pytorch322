@@ -6,7 +6,7 @@ def cat_pool(x, channel_dim, spatial_dims, kernel_size):
     for dim in spatial_dims:
         dim_usage[dim] += 1
     if max(dim_usage) > 1:
-        raise ValueError(f"Redondant dimension in [{channel_dim}], {spatial_dims} for torch of size {x.size()}.")
+        raise ValueError(f"Redundant dimension in [{channel_dim}], {spatial_dims} for torch of size {x.size()}.")
 
     if len(kernel_size) != len(spatial_dims):
         raise ValueError(f"Kernel size and spatial dims do not match ({len(kernel_size)} != {len(spatial_dims)}).")
