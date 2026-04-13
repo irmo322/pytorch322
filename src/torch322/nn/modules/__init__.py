@@ -5,3 +5,4 @@ from .normalization import ChannelNorm
 from .activation import (
     CReLU,
 )
+from .pooling import CatPool, CatUnpool
