@@ -40,7 +40,7 @@ class TestChunkSampler(unittest.TestCase):
         sampler = torch322.utils.data.ChunkSampler(dataset_size=10, chunk_size=3, shuffle=False)
 
         first_pass = list(sampler)  # [0, 1, 2]
-        list(sampler)               # [3, 4, 5] — avance le curseur
+        list(sampler)               # [3, 4, 5]
 
         sampler.reset()
-        assert list(sampler) == first_pass  # doit retrouver [0, 1, 2]
+        assert list(sampler) == first_pass  # [0, 1, 2]
