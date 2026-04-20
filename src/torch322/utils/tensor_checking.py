@@ -13,6 +13,9 @@ def check_tensor_size(tensor_or_size_s, expected_size_s, values=None):
     When compared to None or a strictly negative value, the size of a dimension does not matter.
     When compared to a key, the size of a dimension must be equal to every other size of dimension compared to that same
     key.
+    When compared to a key starting with '*', the key captures zero or more consecutive dimensions as a tuple.
+    This tuple must be equal to every other tuple captured by the same key across different tensors.
+    There can be at most one '*' key in a given expected size.
     Instead of one tensor and one size (as a list-like object), this function also accept nested collections (list or
     dict) of tensors and sizes.
     This function returns a dict mapping string keys found in expected sizes to integer values from tensor sizes if
@@ -32,19 +35,42 @@ def check_tensor_size(tensor_or_size_s, expected_size_s, values=None):
         tensor_or_size_s = tensor_or_size_s.size()
 
     if isinstance(tensor_or_size_s, torch.Size):
-        if len(tensor_or_size_s) != len(expected_size_s):
+
+        star_count = 0
+        for ref_dimension_size in expected_size_s:
+            star_count += type(ref_dimension_size) == str and ref_dimension_size.startswith("*")
+
+        if star_count > 1:
+            raise ValueError(f"Multiple keys starting with '*' found in expected size ({expected_size_s}), "
+                             f"expect no more than one.")
+
+        if star_count == 0 and len(tensor_or_size_s) != len(expected_size_s):
             raise TensorSizeError(
-                f"Number of dimensions in tensor ({len(tensor_or_size_s)}) and expected size ({len(expected_size_s)})"
+                f"Number of dimensions in tensor ({len(tensor_or_size_s)}) and expected size ({len(expected_size_s)}) "
                 f"are different.")
-        for tensor_dimension_size, ref_dimension_size in zip(tensor_or_size_s, expected_size_s):
+        if star_count == 1 and len(tensor_or_size_s) < len(expected_size_s) - 1:
+            raise TensorSizeError(
+                f"Number of dimensions in tensor ({len(tensor_or_size_s)}) incompatible with expected size "
+                f"{expected_size_s}.")
+
+        before_star = True
+        for i, ref_dimension_size in enumerate(expected_size_s):
+            if ref_dimension_size is None or (type(ref_dimension_size) != str and ref_dimension_size < 0):
+                continue
+            if type(ref_dimension_size) == str and ref_dimension_size.startswith("*"):
+                tensor_dimension_size = tuple(
+                    tensor_or_size_s[i: i + len(tensor_or_size_s) - (len(expected_size_s) - 1)])
+                before_star = False
+            else:
+                tensor_dimension_size = (
+                    tensor_or_size_s[i] if before_star
+                    else tensor_or_size_s[i - len(expected_size_s)])
             if type(ref_dimension_size) == str:
                 if ref_dimension_size in values:
                     ref_dimension_size = values[ref_dimension_size]
                 else:
                     values[ref_dimension_size] = tensor_dimension_size
                     continue
-            elif ref_dimension_size is None or ref_dimension_size < 0:
-                continue
             if ref_dimension_size != tensor_dimension_size:
                 raise TensorSizeError(
                     f"Tensor size ({tensor_or_size_s}) not compatible with expected size ({expected_size_s}). "
