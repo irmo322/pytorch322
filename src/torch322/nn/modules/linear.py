@@ -11,8 +11,9 @@ class LinearStdWeight(Linear):
     # bias are initialized using standard normal (mu=0, sigma=1)
     # self.normalize_weight() must be called after each weight update in order to constrain weight.
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, use_norm_factor=True, **kwargs):
         super().__init__(*args, **kwargs)
+        self.use_norm_factor = use_norm_factor
         self.norm_factor = 1 / math.sqrt(self.in_features + (0 if self.bias is None else 1))
 
     def reset_parameters(self):
@@ -22,7 +23,10 @@ class LinearStdWeight(Linear):
         self.normalize_weight()
 
     def forward(self, *args, **kwargs):
-        return super().forward(*args, **kwargs) * self.norm_factor
+        y = super().forward(*args, **kwargs)
+        if self.use_norm_factor:
+            y *= self.norm_factor
+        return y
 
     def normalize_weight(self):
         self.weight.data *= math.sqrt(self.weight.data.numel()) / matrix_norm(self.weight.data)
