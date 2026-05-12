@@ -59,7 +59,7 @@ class ConvSparseKernel(torch.nn.Module):
             self,
             in_channels: int,
             out_channels: int,
-            kernel_size: torch.Size,
+            kernel_size: torch.Size | tuple[int, ...],
             kernel_keys,
             stride: tuple[int, ...] = None,
             bias: bool = True,
